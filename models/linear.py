@@ -7,7 +7,7 @@ from .optimization import gd
 class BaseLinearModel(metaclass=ABCMeta):
     """ Base linear model """
 
-    def __init__(self, alpha=0.01, n_iters=1000, tol=0.0001, debug=False):
+    def __init__(self, alpha=.01, n_iters=1000, tol=.001, debug=False):
         self._coef = None
         self._alpha = alpha
         self._n_iters = n_iters
@@ -68,7 +68,7 @@ class LinearRegression(BaseLinearModel):
         loss = self._loss(X, y, coef)
         m = X.shape[0]
 
-        return np.sum(loss ** 2) / (2 * m)
+        return (loss.T * loss) / (2 * m)
 
     def _gradient_f(self, X, y, coef):
         loss = self._loss(X, y, coef)
@@ -80,7 +80,7 @@ class LinearRegression(BaseLinearModel):
 class RidgeRegression(LinearRegression):
     """ Ridge regression (Linear regression with L2 regularization) """
 
-    def __init__(self, alpha=0.01, lambda_coef=0.1, n_iters=1000, tol=0.0001, debug=False):
+    def __init__(self, alpha=.01, lambda_coef=.1, n_iters=1000, tol=.001, debug=False):
         self._lambda_coef = lambda_coef
         super(RidgeRegression, self).__init__(
             alpha=alpha,
@@ -96,16 +96,14 @@ class RidgeRegression(LinearRegression):
     def _cost_f(self, X, y, coef):
         loss = self._loss(X, y, coef)
         m = X.shape[0]
+        penalty = self._lambda_coef * np.sum(np.dot(coef[1:].T, coef[1:]))
 
-        # noinspection PyTypeChecker
-        penalty = self._lambda_coef * np.sum(coef ** 2)
-
-        return (np.sum(loss ** 2) + penalty) / (2 * m)
+        return (np.sum(np.dot(loss.T, loss)) + penalty) / (2 * m)
 
     def _gradient_f(self, X, y, coef):
         loss = self._loss(X, y, coef)
         m = X.shape[0]
+        penalty = self._lambda_coef * np.sum(coef[1:])
 
-        penalty = self._lambda_coef * np.sum(coef)
-
-        return (np.dot(X.T, loss) + penalty) / m
+        # don't regularize intercept
+        return (np.dot(X.T, loss) + np.array([0, penalty]).reshape(2, 1)) / m

@@ -1,7 +1,7 @@
 import numpy as np
 
 
-def gd(X, y, gradient_f, cost_f=None, alpha=0.01, n_iters=1000, tol=0.0001, debug=False):
+def gd(X, y, gradient_f, cost_f=None, alpha=.01, n_iters=1000, tol=.001, debug=False):
     """ Full batch gradient descent """
 
     coef = np.ones((X.shape[1], 1))
