@@ -77,7 +77,7 @@ class LinearRegression(BaseLinearModel):
         return np.dot(X.T, loss) / m
 
 
-class RidgeRegression(LinearRegression):
+class RidgeRegression(BaseLinearModel):
     """ Ridge regression (Linear regression with L2 regularization) """
 
     def __init__(self, alpha=.01, lambda_coef=.1, n_iters=1000, tol=.001, debug=False):
