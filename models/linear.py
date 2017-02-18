@@ -7,24 +7,25 @@ from .optimization import gd
 class BaseLinearModel(metaclass=ABCMeta):
     """ Base linear model """
 
-    def __init__(self, alpha=0.01, n_iters=1000, debug=False):
+    def __init__(self, alpha=0.01, n_iters=1000, tol=0.0001, debug=False):
         self._coef = None
         self._alpha = alpha
         self._n_iters = n_iters
         self._debug = debug
+        self._tol = tol
 
     def fit(self, X, y):
         # add intercept column
         X_copy = np.insert(X, 0, [1], axis=1)
-        print(X_copy)
 
         self._coef, cost = gd(
             X_copy,
             y,
             gradient_f=self._gradient_f,
+            cost_f=self._cost_f,
             alpha=self._alpha,
             n_iters=self._n_iters,
-            cost_f=self._cost_f,
+            tol=self._tol,
             debug=self._debug
         )
 

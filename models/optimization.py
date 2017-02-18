@@ -1,15 +1,20 @@
 import numpy as np
 
 
-def gd(X, y, gradient_f, alpha=0.01, n_iters=1000, cost_f=None, debug=False):
+def gd(X, y, gradient_f, cost_f=None, alpha=0.01, n_iters=1000, tol=0.0001, debug=False):
     """ Full batch gradient descent """
 
     coef = np.ones((X.shape[1], 1))
-    cost = []
+    costs = []
     for _ in range(n_iters):
         gradient = gradient_f(X, y, coef)
         coef -= alpha * gradient
+        cost = cost_f(X, y, coef)
         if debug:
-            cost.append(cost_f(X, y, coef))
+            costs.append(cost)
 
-    return coef, cost
+        # check tolerance
+        if cost <= tol:
+            break
+
+    return coef, costs
