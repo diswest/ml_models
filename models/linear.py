@@ -93,8 +93,8 @@ class LinearRegression(BaseLinearModel):
 class RidgeRegression(LinearRegression):
     """ Ridge regression (Linear regression with L2 regularization) """
 
-    def __init__(self, alpha=.01, lambda_coef=.1, n_iters=1000, tol=.0001, debug=False):
-        self._lambda_coef = lambda_coef
+    def __init__(self, alpha=.01, l2_penalty=.1, n_iters=1000, tol=.0001, debug=False):
+        self._l2_penalty = l2_penalty
         super(RidgeRegression, self).__init__(
             alpha=alpha,
             n_iters=n_iters,
@@ -105,14 +105,14 @@ class RidgeRegression(LinearRegression):
     def _cost_f(self, X, y, coef):
         loss = self._loss(X, y, coef)
         m = X.shape[0]
-        penalty = self._lambda_coef * np.sum(np.dot(coef[1:].T, coef[1:]))
+        penalty = self._l2_penalty * np.sum(np.dot(coef[1:].T, coef[1:]))
 
         return (np.dot(loss.T, loss).flatten() + penalty) / (2 * m)
 
     def _gradient_f(self, X, y, coef):
         loss = self._loss(X, y, coef)
         m = X.shape[0]
-        penalty = self._lambda_coef * np.sum(coef[1:])
+        penalty = self._l2_penalty * np.sum(coef[1:])
 
         gradient = -np.dot(X.T, loss) + penalty
         gradient[0] -= penalty
@@ -123,8 +123,8 @@ class RidgeRegression(LinearRegression):
 class Lasso(BaseLinearModel):
     """ LASSO (Least Absolute Shrinkage and Selection Operator, linear regression with L1 regularization) """
 
-    def __init__(self, lambda_coef=.1, n_iters=1000, tol=.0001, debug=False):
-        self._lambda_coef = lambda_coef
+    def __init__(self, l1_penalty=.1, n_iters=1000, tol=.0001, debug=False):
+        self._l1_penalty = l1_penalty
 
         super(Lasso, self).__init__(
             n_iters=n_iters,
@@ -153,9 +153,9 @@ class Lasso(BaseLinearModel):
         return ro if j == 0 else self._soft_threshold(ro)
 
     def _soft_threshold(self, ro):
-        if ro < -self._lambda_coef/2:
-            return ro + self._lambda_coef/2
-        elif -self._lambda_coef/2 <= ro <= self._lambda_coef/2:
+        if ro < -self._l1_penalty/2:
+            return ro + self._l1_penalty/2
+        elif -self._l1_penalty/2 <= ro <= self._l1_penalty/2:
             return 0
-        elif ro > self._lambda_coef/2:
-            return ro - self._lambda_coef/2
+        elif ro > self._l1_penalty/2:
+            return ro - self._l1_penalty/2
